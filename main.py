@@ -1,6 +1,5 @@
 from addressbook.address_book import AddressBook
 from handlers.notes_handlers import add_note, edit_note, delete_note, show_notes
-from notes import notes_manager
 from services.storage import load_data, save_data
 from utils.parser import parse_input
 
@@ -62,7 +61,7 @@ def main():
             print(delete_contact(args, book))
 
         elif command == "add-note":
-            print(add_note(args, notes_manager))
+            print(add_note(args, book))
 
         elif command == "edit-note":
             print(edit_note(args, book))
