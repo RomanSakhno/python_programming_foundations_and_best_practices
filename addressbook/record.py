@@ -44,6 +44,14 @@ class Record:
     def add_note(self, text):
         self.notes.append(text)
 
+    def edit_note(self, index, new_text):
+        if index < 0 or index >= len(self.notes):
+            raise IndexError("Note index out of range.")
+        self.notes[index] = new_text
+
+    def list_notes(self):
+        return [f"{i}: {note}" for i, note in enumerate(self.notes)]
+
     def delete_note(self, index):
         self.notes.pop(index)
 
