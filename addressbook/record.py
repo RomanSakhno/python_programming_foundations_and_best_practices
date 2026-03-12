@@ -1,4 +1,6 @@
 from .fields import Name, Phone, Birthday, Email
+from colorama import Fore, Style
+white = f"{Style.BRIGHT}"
 
 
 class Record:
@@ -76,35 +78,31 @@ class Record:
         raise ValueError("Phone not found.")
 
     def __str__(self):
-        # Верхняя граница блока контакта
-        lines = [f"{'=' * 40}"]
+        lines = []
 
         # Name
-        lines.append(f"📇 Name: {self.name.value}")
+        lines.append(f"📇 {Style.BRIGHT}Name: {Fore.GREEN}{self.name.value}{Style.RESET_ALL}")
 
         # Phones
         if self.phones:
             phones_str = "; ".join(p.value for p in self.phones)
-            lines.append(f"  📞 Phones: {phones_str}")
+            lines.append(f"{white}  📞 Phones: {phones_str}{Style.RESET_ALL}")
         else:
-            lines.append("  📞 Phones: Not set")
+            lines.append(f"{white}  📞 Phones: Not set{Style.RESET_ALL}")
 
         # Email
-        lines.append(f"  ✉ Email: {self.email if self.email else 'Not set'}")
+        lines.append(f"{white}  ✉ Email: {self.email if self.email else 'Not set'}{Style.RESET_ALL}")
 
         # Birthday
-        lines.append(f"  🎂 Birthday: {str(self.birthday) if self.birthday else 'Not set'}")
+        lines.append(f"{white}  🎂 Birthday: {str(self.birthday) if self.birthday else 'Not set'}{Style.RESET_ALL}")
 
         # Notes
         if self.notes:
-            lines.append("  📝 Notes:")
+            lines.append(f"{white}  📝 Notes:{Style.RESET_ALL}")
             for i, note in enumerate(self.notes):
                 tags_str = f" [{', '.join(note['tags'])}]" if note["tags"] else ""
-                lines.append(f"    {i}. {note['text']}{tags_str}")
+                lines.append(f"{white}    {i}. {note['text']}{tags_str}{Style.RESET_ALL}")
         else:
-            lines.append("  📝 Notes: None")
-
-        # Нижняя граница блока контакта
-        lines.append(f"{'=' * 40}")
+            lines.append(f"{white}  📝 Notes: None{Style.RESET_ALL}")
 
         return "\n".join(lines)
