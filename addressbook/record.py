@@ -1,4 +1,4 @@
-from .fields import Name, Phone, Birthday
+from .fields import Name, Phone, Birthday, Email
 
 
 class Record:
@@ -6,7 +6,18 @@ class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
+        self.email = None
         self.birthday = None
+        self.notes = []
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+        if not hasattr(self, "email"):
+            self.email = None
+
+        if not hasattr(self, "notes"):
+            self.notes = []
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
@@ -26,6 +37,22 @@ class Record:
 
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
+
+    def add_email(self, email):
+        self.email = Email(email)
+
+    def add_note(self, text):
+        self.notes.append(text)
+
+    def delete_note(self, index):
+        self.notes.pop(index)
+
+    def remove_phone(self, phone):
+        for p in self.phones:
+            if p.value == phone:
+                self.phones.remove(p)
+                return True
+        raise ValueError("Phone not found.")
 
     def __str__(self):
         phones = "; ".join(p.value for p in self.phones)
