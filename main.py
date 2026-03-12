@@ -1,4 +1,6 @@
 from addressbook.address_book import AddressBook
+from handlers.notes_handlers import add_note
+from notes import notes_manager
 from services.storage import load_data, save_data
 from utils.parser import parse_input
 
@@ -6,7 +8,7 @@ from handlers.contact_handlers import (
     add_contact,
     change_contact,
     show_phone,
-    show_all
+    show_all, search_contacts, delete_contact, edit_email, edit_name, delete_phone
 )
 
 from handlers.birthday_handlers import (
@@ -52,6 +54,24 @@ def main():
 
         elif command == "birthdays":
             print(birthdays(args, book))
+
+        elif command == "search":
+            print(search_contacts(args, book))
+
+        elif command == "delete":
+            print(delete_contact(args, book))
+
+        elif command == "add-note":
+            print(add_note(args, notes_manager))
+
+        elif command == "edit-email":
+            print(edit_email(args, book))
+
+        elif command == "edit-name":
+            print(edit_name(args, book))
+
+        elif command == "delete-phone":
+            print(delete_phone(args, book))
 
         else:
             print("Invalid command.")

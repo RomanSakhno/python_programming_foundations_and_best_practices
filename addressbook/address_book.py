@@ -54,3 +54,38 @@ class AddressBook(UserDict):
                 })
 
         return upcoming
+
+    def search(self, query):
+
+        results = []
+
+        for record in self.data.values():
+
+            if query.lower() in record.name.value.lower():
+                results.append(record)
+                continue
+
+            for phone in record.phones:
+                if query in phone.value:
+                    results.append(record)
+                    break
+
+            if record.email and query in record.email.value:
+                results.append(record)
+
+        return results
+
+    def rename(self, old_name, new_name):
+
+        record = self.find(old_name)
+
+        if not record:
+            return None
+
+        del self.data[old_name]
+
+        record.name.value = new_name
+
+        self.data[new_name] = record
+
+        return record
