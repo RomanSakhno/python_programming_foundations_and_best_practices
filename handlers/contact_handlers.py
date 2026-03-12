@@ -58,7 +58,10 @@ def show_all(args, book):
     if not book.data:
         return "No contacts found."
 
-    return "\n".join(str(record) for record in book.data.values())
+    border = "=" * 40
+    contacts = "\n\n".join(str(record) for record in book.data.values())
+
+    return f"{border}\n{contacts}\n{border}"
 
 @input_error
 def search_contacts(args, book):
