@@ -53,7 +53,7 @@ def show_phone(args, book):
 
 
 @input_error
-def show_all(book):
+def show_all(args, book):
 
     if not book.data:
         return "No contacts found."
