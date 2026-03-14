@@ -47,6 +47,9 @@ def delete_note(args, book):
 
 @input_error
 def show_notes(args, book):
+    if not args:
+        return "Please specify contact name. Example: notes Vasya"
+
     name = args[0]
     filter_tag = args[1] if len(args) > 1 else None
     record = book.find(name)
@@ -55,3 +58,37 @@ def show_notes(args, book):
 
     notes = record.list_notes(filter_tag)
     return "\n".join(notes) if notes else "No notes found."
+
+@input_error
+def search_notes(args, book):
+    name, tag = args
+
+    record = book.find(name)
+
+    if not record:
+        return "Contact not found."
+
+    result = [
+        note for note in record.notes
+            if tag.lower() in [t.lower() for t in note["tags"]]
+        ]
+
+    if not result:
+        return f"No notes with tag '{tag}'."
+
+    lines = []
+    lines.append("=" * 40)
+    lines.append(f"📝 Notes with tag '{tag}'")
+    lines.append(f"📇 Contact: {record.name.value}")
+    lines.append("")
+
+    for i, note in enumerate(result, 1):
+        tags = ", ".join(note["tags"]) if note["tags"] else "no tags"
+
+        lines.append(f"  {i}. 📄 {note['text']}")
+        lines.append(f"     🏷 Tags: {tags}")
+        lines.append("")
+
+    lines.append("=" * 40)
+
+    return "\n".join(lines)

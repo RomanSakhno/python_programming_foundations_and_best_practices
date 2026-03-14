@@ -20,7 +20,8 @@ from .notes_handlers import (
     add_note,
     edit_note,
     delete_note,
-    show_notes
+    show_notes,
+    search_notes
 )
 
 COMMANDS = {
@@ -40,6 +41,7 @@ COMMANDS = {
     "edit-note": edit_note,
     "delete-note": delete_note,
     "show-notes": show_notes,
+    "search_note": search_notes,
     "edit-email": edit_email,
     "edit-name": edit_name,
     "delete-phone": delete_phone,

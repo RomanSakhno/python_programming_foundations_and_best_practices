@@ -8,7 +8,10 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def find(self, name):
-        return self.data.get(name)
+        for key in self.data:
+            if key.lower() == name.lower():
+                return self.data[key]
+        return None
 
     def delete(self, name):
         return self.data.pop(name, None)
