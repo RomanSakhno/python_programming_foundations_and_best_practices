@@ -1,5 +1,3 @@
-import difflib
-
 COMMAND_ALIASES = {
     "add": ["create", "new", "insert"],
     "change": ["edit", "update", "modify"],

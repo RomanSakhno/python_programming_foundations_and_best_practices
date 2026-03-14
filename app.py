@@ -31,7 +31,6 @@ if user_input:
     action = COMMANDS.get(command)
     result = action(args, book)
 
-    # Красивый HTML вывод
     if command in ["show-notes", "search-note"]:
         name = args[0]
         tag = args[1] if len(args) > 1 else None
@@ -42,7 +41,6 @@ if user_input:
         else:
             st.warning("Contact not found")
     elif command in ["phone", "all", "birthdays", "birthdays-in", "show-birthday"]:
-        # Для контактов и дней рождений
         if command == "all":
             html = "".join(record_to_html(r) for r in book.data.values())
             st.markdown(html, unsafe_allow_html=True)

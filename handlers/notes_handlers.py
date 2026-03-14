@@ -89,7 +89,7 @@ def search_notes(args, book):
     for i, note in enumerate(result, 1):
         tags = ", ".join(note["tags"]) if note["tags"] else "No tags"
         lines.append(f"{i}. 📄 {note['text']}")
-        lines.append(f"   🏷 Tags: {tags}")
-        lines.append("")  # пустая строка между заметками
+        lines.append(f"   🔖 Tags: {tags}")
+        lines.append("")
 
     return "\n".join(lines)

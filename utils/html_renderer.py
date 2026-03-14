@@ -22,7 +22,7 @@ def record_to_html(record):
         html += "<h4>📝 Notes:</h4><ul>"
         for i, note in enumerate(record.notes, 1):
             tags = ", ".join(note["tags"]) if note["tags"] else "No tags"
-            html += f"<li>{i}. 📄 {note['text']}<br>🏷 Tags: {tags}</li>"
+            html += f"<li>{i}. 📄 {note['text']}<br>🔖 Tags: {tags}</li>"
         html += "</ul>"
     else:
         html += "<p>📝 Notes: None</p>"
@@ -41,6 +41,6 @@ def notes_to_html(record, tag=None):
     html = f"<h4>📝 Notes{' with tag '+tag if tag else ''} for {record.name.value}</h4><ul>"
     for i, note in enumerate(notes, 1):
         tags = ", ".join(note["tags"]) if note["tags"] else "No tags"
-        html += f"<li>{i}. 📄 {note['text']}<br>🏷 Tags: {tags}</li>"
+        html += f"<li>{i}. 📄 {note['text']}<br>🔖 Tags: {tags}</li>"
     html += "</ul>"
     return html

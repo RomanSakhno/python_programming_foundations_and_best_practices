@@ -1,5 +1,3 @@
-import re
-
 COMMAND_METADATA = {
     "birthdays-in": {
         "aliases": ["birthdays in", "within", "within days"],
