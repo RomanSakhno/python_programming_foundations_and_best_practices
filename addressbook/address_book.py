@@ -13,7 +13,10 @@ class AddressBook(UserDict):
 
     def find(self, name):
         """Return the record for the given name or None."""
-        return self.data.get(name)
+        for key in self.data:
+            if key.lower() == name.lower():
+                return self.data[key]
+        return None
 
     def delete(self, name):
         """Remove and return the record for the given name, if any."""

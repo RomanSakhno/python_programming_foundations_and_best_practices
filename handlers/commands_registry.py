@@ -7,7 +7,7 @@ from .contact_handlers import (
     delete_contact,
     edit_email,
     edit_name,
-    delete_phone,
+    delete_phone
 )
 
 from .birthday_handlers import (
@@ -22,6 +22,7 @@ from .notes_handlers import (
     edit_note,
     delete_note,
     show_notes,
+    search_notes
 )
 
 COMMANDS = {
@@ -42,6 +43,7 @@ COMMANDS = {
     "edit-note": edit_note,
     "delete-note": delete_note,
     "show-notes": show_notes,
+    "search-note": search_notes,
     "edit-email": edit_email,
     "edit-name": edit_name,
     "delete-phone": delete_phone,
