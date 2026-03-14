@@ -3,7 +3,7 @@ from handlers.commands_registry import COMMANDS
 from services.storage import load_data, save_data
 from utils.nlp_engine import interpret_command, resolve_command
 from utils.parser import parse_input
-from utils.html_renderer import record_to_html, notes_to_html
+from utils.html_renderer import record_to_html, notes_to_html, record_card_html, notes_card_html
 
 book = load_data()
 
@@ -31,27 +31,52 @@ if user_input:
     action = COMMANDS.get(command)
     result = action(args, book)
 
-    if command in ["show-notes", "search-note"]:
+    if command in ["show-notes", "search-note", "find"]:
         name = args[0]
         tag = args[1] if len(args) > 1 else None
         record = book.find(name)
         if record:
-            html = notes_to_html(record, tag)
+            html = notes_card_html(record, tag)
             st.markdown(html, unsafe_allow_html=True)
         else:
             st.warning("Contact not found")
+
     elif command in ["phone", "all", "birthdays", "birthdays-in", "show-birthday"]:
         if command == "all":
-            html = "".join(record_to_html(r) for r in book.data.values())
+            html = "".join(record_card_html(r) for r in book.data.values())
             st.markdown(html, unsafe_allow_html=True)
+
         elif command in ["birthdays", "birthdays-in"]:
             st.text(result)
+
         else:
             record = book.find(args[0])
             if record:
-                st.markdown(record_to_html(record), unsafe_allow_html=True)
+                st.markdown(record_card_html(record), unsafe_allow_html=True)
             else:
                 st.warning("Contact not found")
+
+#    if command in ["show-notes", "search-note"]:
+#        name = args[0]
+#        tag = args[1] if len(args) > 1 else None
+#        record = book.find(name)
+#        if record:
+#            html = notes_to_html(record, tag)
+#            st.markdown(html, unsafe_allow_html=True)
+#        else:
+#            st.warning("Contact not found")
+#    elif command in ["phone", "all", "birthdays", "birthdays-in", "show-birthday"]:
+#        if command == "all":
+#            html = "".join(record_to_html(r) for r in book.data.values())
+#            st.markdown(html, unsafe_allow_html=True)
+#        elif command in ["birthdays", "birthdays-in"]:
+#            st.text(result)
+#        else:
+#            record = book.find(args[0])
+#            if record:
+#                st.markdown(record_to_html(record), unsafe_allow_html=True)
+#            else:
+#                st.warning("Contact not found")
     else:
         st.write(result)
 
