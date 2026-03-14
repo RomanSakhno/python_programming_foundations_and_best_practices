@@ -1,4 +1,8 @@
+"""Reusable decorators for wrapping handler functions."""
+
+
 def input_error(func):
+    """Convert common handler exceptions into user-friendly messages."""
 
     def inner(*args, **kwargs):
 

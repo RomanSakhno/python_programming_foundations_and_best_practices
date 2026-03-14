@@ -7,22 +7,22 @@ from .contact_handlers import (
     delete_contact,
     edit_email,
     edit_name,
-    delete_phone
+    delete_phone,
 )
 
 from .birthday_handlers import (
     add_birthday,
     show_birthday,
-    birthdays
+    birthdays,
+    birthdays_in,
 )
 
 from .notes_handlers import (
     add_note,
     edit_note,
     delete_note,
-    show_notes
+    show_notes,
 )
-#### testestretsf
 
 COMMANDS = {
     "close": lambda args, book: ("exit", "Good bye!"),
@@ -35,6 +35,7 @@ COMMANDS = {
     "add-birthday": add_birthday,
     "show-birthday": show_birthday,
     "birthdays": birthdays,
+    "birthdays-in": birthdays_in,
     "search": search_contacts,
     "delete": delete_contact,
     "add-note": add_note,
