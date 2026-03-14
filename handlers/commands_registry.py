@@ -43,7 +43,7 @@ COMMANDS = {
     "edit-note": edit_note,
     "delete-note": delete_note,
     "show-notes": show_notes,
-    "search_note": search_notes,
+    "search-note": search_notes,
     "edit-email": edit_email,
     "edit-name": edit_name,
     "delete-phone": delete_phone,

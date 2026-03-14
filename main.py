@@ -4,9 +4,7 @@ from addressbook.address_book import AddressBook
 from handlers.commands_registry import COMMANDS
 from services.storage import load_data, save_data
 from utils.parser import parse_input
-from utils.command_suggester import resolve_command
-from utils.nlp_command_parser import detect_command_from_text
-from utils.nlp_interpreter import interpret_natural_command
+from utils.nlp_engine import interpret_command, resolve_command
 
 
 def main():
@@ -16,15 +14,11 @@ def main():
 
     while True:
         user_input = input("Enter a command: ")
-        command, args = interpret_natural_command(user_input)
+
+        command, args = interpret_command(user_input, COMMANDS.keys())
 
         if not command:
             command, args = parse_input(user_input)
-
-        if command not in COMMANDS:
-            detected = detect_command_from_text(user_input, COMMANDS.keys())
-            if detected:
-                command = detected
 
         resolved_command, suggestion = resolve_command(command, COMMANDS.keys())
 
@@ -38,6 +32,10 @@ def main():
             continue
 
         action = COMMANDS.get(command)
+
+        if not action:
+            print(f"Command '{command}' not implemented.")
+            continue
 
         try:
             result = action(args, book)
