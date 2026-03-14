@@ -70,31 +70,26 @@ def search_notes(args, book):
     name, tag = args
 
     record = book.find(name)
-
     if not record:
         return "Contact not found."
 
     result = [
         note for note in record.notes
-            if tag.lower() in [t.lower() for t in note["tags"]]
-        ]
+        if tag.lower() in [t.lower() for t in note["tags"]]
+    ]
 
     if not result:
         return f"No notes with tag '{tag}'."
 
     lines = []
-    lines.append("=" * 40)
-    lines.append(f"📝 Notes with tag '{tag}'")
-    lines.append(f"📇 Contact: {record.name.value}")
+    lines.append(f"**📝 Notes with tag '{tag}'**")
+    lines.append(f"**📇 Contact:** {record.name.value}")
     lines.append("")
 
     for i, note in enumerate(result, 1):
-        tags = ", ".join(note["tags"]) if note["tags"] else "no tags"
-
-        lines.append(f"  {i}. 📄 {note['text']}")
-        lines.append(f"     🏷 Tags: {tags}")
-        lines.append("")
-
-    lines.append("=" * 40)
+        tags = ", ".join(note["tags"]) if note["tags"] else "No tags"
+        lines.append(f"{i}. 📄 {note['text']}")
+        lines.append(f"   🏷 Tags: {tags}")
+        lines.append("")  # пустая строка между заметками
 
     return "\n".join(lines)
