@@ -64,15 +64,17 @@ def show_all(args, book):
 
 @input_error
 def search_contacts(args, book):
-
     query = args[0]
-
     results = book.search(query)
 
     if not results:
         return "No contacts found."
 
-    return "\n".join(str(r) for r in results)
+    lines = []
+    for r in results:
+        lines.append(str(r))
+
+    return "\n".join(lines)
 
 @input_error
 def delete_contact(args, book):
