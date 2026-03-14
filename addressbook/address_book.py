@@ -1,19 +1,31 @@
+"""Container and search logic for contact records."""
+
 from collections import UserDict
 from datetime import datetime, timedelta
 
 
 class AddressBook(UserDict):
+    """Dictionary-like collection of contact records keyed by name."""
 
     def add_record(self, record):
+        """Add a new contact record to the address book."""
         self.data[record.name.value] = record
 
     def find(self, name):
+        """Return the record for the given name or None."""
         return self.data.get(name)
 
     def delete(self, name):
+        """Remove and return the record for the given name, if any."""
         return self.data.pop(name, None)
 
     def get_upcoming_birthdays(self):
+        """Return contacts with birthdays in the next 7 days.
+
+        Birthdays that fall on a weekend are shifted to the following Monday
+        for the congratulation date. The result is a list of dictionaries
+        containing contact name and formatted congratulation date.
+        """
         today = datetime.today().date()
         upcoming = []
 
@@ -56,6 +68,7 @@ class AddressBook(UserDict):
         return upcoming
 
     def search(self, query):
+        """Search contacts by name, phone number or email substring."""
 
         results = []
 
@@ -76,6 +89,7 @@ class AddressBook(UserDict):
         return results
 
     def rename(self, old_name, new_name):
+        """Rename a contact, preserving its record."""
 
         record = self.find(old_name)
 

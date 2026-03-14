@@ -1,8 +1,11 @@
+"""Handlers for managing per-contact notes via the CLI."""
+
 from utils.decorators import input_error
 
 
 @input_error
 def add_note(args, book):
+    """Add a note with optional tags to the given contact."""
     name, *rest = args
     tags = []
 
@@ -11,15 +14,17 @@ def add_note(args, book):
         tags = [t.strip() for t in tag_str[5:].split(",") if t.strip()]
 
     note_text = " ".join(rest)
-    record = book.find(name)  # Используем AddressBook
+    record = book.find(name)
     if not record:
         raise KeyError(f"Contact '{name}' not found.")
 
     record.add_note(note_text, tags)
     return "Note added."
 
+
 @input_error
 def edit_note(args, book):
+    """Edit an existing note for a contact, updating text and/or tags."""
     name, index_str, *rest = args
     new_tags = None
 
@@ -35,8 +40,10 @@ def edit_note(args, book):
     record.edit_note(int(index_str), new_text, new_tags)
     return "Note updated."
 
+
 @input_error
 def delete_note(args, book):
+    """Delete a note by index for the given contact."""
     name, index_str = args
     record = book.find(name)
     if not record:
@@ -45,8 +52,10 @@ def delete_note(args, book):
     record.delete_note(int(index_str))
     return "Note deleted."
 
+
 @input_error
 def show_notes(args, book):
+    """Show all notes for a contact, optionally filtered by tag."""
     name = args[0]
     filter_tag = args[1] if len(args) > 1 else None
     record = book.find(name)
