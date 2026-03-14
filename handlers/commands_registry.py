@@ -13,7 +13,8 @@ from .contact_handlers import (
 from .birthday_handlers import (
     add_birthday,
     show_birthday,
-    birthdays
+    birthdays,
+    birthdays_in,
 )
 
 from .notes_handlers import (
@@ -35,6 +36,7 @@ COMMANDS = {
     "add-birthday": add_birthday,
     "show-birthday": show_birthday,
     "birthdays": birthdays,
+    "birthdays-in": birthdays_in,
     "search": search_contacts,
     "delete": delete_contact,
     "add-note": add_note,
