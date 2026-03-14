@@ -93,31 +93,22 @@ class Record:
         raise ValueError("Phone not found.")
 
     def __str__(self):
-        lines = []
+        phones = ", ".join(p.value for p in self.phones) if self.phones else "Not set"
+        email = self.email if self.email else "Not set"
+        birthday = str(self.birthday) if self.birthday else "Not set"
 
-        # Name
-        lines.append(f"📇 {Style.BRIGHT}Name: {Fore.GREEN}{self.name.value}{Style.RESET_ALL}")
-
-        # Phones
-        if self.phones:
-            phones_str = "; ".join(p.value for p in self.phones)
-            lines.append(f"{white}  📞 Phones: {phones_str}{Style.RESET_ALL}")
-        else:
-            lines.append(f"{white}  📞 Phones: Not set{Style.RESET_ALL}")
-
-        # Email
-        lines.append(f"{white}  ✉ Email: {self.email if self.email else 'Not set'}{Style.RESET_ALL}")
-
-        # Birthday
-        lines.append(f"{white}  🎂 Birthday: {str(self.birthday) if self.birthday else 'Not set'}{Style.RESET_ALL}")
-
-        # Notes
+        notes_str = ""
         if self.notes:
-            lines.append(f"{white}  📝 Notes:{Style.RESET_ALL}")
-            for i, note in enumerate(self.notes):
-                tags_str = f" [{', '.join(note['tags'])}]" if note["tags"] else ""
-                lines.append(f"{white}    {i}. {note['text']}{tags_str}{Style.RESET_ALL}")
+            for i, note in enumerate(self.notes, 1):
+                tags = f" [{', '.join(note['tags'])}]" if note['tags'] else ""
+                notes_str += f"{i}. {note['text']}{tags}\n"
         else:
-            lines.append(f"{white}  📝 Notes: None{Style.RESET_ALL}")
+            notes_str = "No notes"
 
-        return "\n".join(lines)
+        return (
+            f"**📇 Name:** {self.name.value}\n"
+            f"📞 Phones: {phones}\n"
+            f"✉ Email: {email}\n"
+            f"🎂 Birthday: {birthday}\n"
+            f"📝 Notes:\n{notes_str}"
+        )
