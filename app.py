@@ -4,49 +4,61 @@ from services.storage import load_data, save_data
 from utils.nlp_engine import interpret_command, resolve_command
 from utils.parser import parse_input
 from utils.html_renderer import record_card_html, notes_card_html
+from utils.birthday_calendar import render_birthday_calendar
+from ClientApp.utils.notes_sidebar import render_notes_by_tags
+
+left_spacer, main= st.columns([1, 3])
 
 book = load_data()
 
-st.title("📇 Address Book Assistant")
+st.sidebar.markdown(
+    render_birthday_calendar(book),unsafe_allow_html=True)
 
-user_input = st.text_input("Enter command")
+st.sidebar.markdown(
+    render_notes_by_tags(book), unsafe_allow_html=True)
 
-if user_input:
-    command, args = interpret_command(user_input, COMMANDS.keys())
 
-    if not command:
-        command, args = parse_input(user_input)
+with main:
+    st.title("📇 Address Book Assistant")
 
-    resolved_command, suggestion = resolve_command(command, COMMANDS.keys())
+    user_input = st.text_input("Enter command")
 
-    if resolved_command:
-        command = resolved_command
-    else:
-        if suggestion:
-            st.warning(f"Did you mean '{suggestion}'?")
+    if user_input:
+        command, args = interpret_command(user_input, COMMANDS.keys())
+
+        if not command:
+            command, args = parse_input(user_input)
+
+        resolved_command, suggestion = resolve_command(command, COMMANDS.keys())
+
+        if resolved_command:
+            command = resolved_command
         else:
-            st.error("Invalid command")
-        st.stop()
+            if suggestion:
+                st.warning(f"Did you mean '{suggestion}'?")
+            else:
+                st.error("Invalid command")
+            st.stop()
 
-    action = COMMANDS.get(command)
-    if not action:
-        st.warning(f"Command '{command}' not implemented")
-        st.stop()
+        action = COMMANDS.get(command)
+        if not action:
+            st.warning(f"Command '{command}' not implemented")
+            st.stop()
 
-    result = action(args, book)
+        result = action(args, book)
 
-    if command in ["show-notes", "search-note"]:
-        name = args[0]
-        tag = args[1] if len(args) > 1 else None
-        record = book.find(name)
-        if record:
-            html = notes_card_html(record, tag)
-            st.markdown(html, unsafe_allow_html=True)
-        else:
-            st.warning("Contact not found")
+        if command in ["show-notes", "search-note"]:
+            name = args[0]
+            tag = args[1] if len(args) > 1 else None
+            record = book.find(name)
+            if record:
+                html = notes_card_html(record, tag)
+                st.markdown(html, unsafe_allow_html=True)
+            else:
+                st.warning("Contact not found")
 
-    elif command in ["phone", "show-birthday"]:
-        html = f"""
+        elif command in ["phone", "show-birthday"]:
+            html = f"""
                     <div style="
                         border: 1px solid #ccc;
                         border-radius: 10px;
@@ -58,26 +70,38 @@ if user_input:
                         <strong>{result}</strong>
                     </div>
                     """
-        st.markdown(html, unsafe_allow_html=True)
-
-    elif command in ["find", "search"]:
-        record = book.find(args[0])
-        if record:
-            html = record_card_html(record)
             st.markdown(html, unsafe_allow_html=True)
+
+        elif command in ["find", "search"]:
+            record = book.find(args[0])
+            if record:
+                html = record_card_html(record)
+                st.markdown(html, unsafe_allow_html=True)
+            else:
+                st.warning("Contact not found")
+
+        elif command in ["all"]:
+            from collections import defaultdict
+
+            contacts_by_letter = defaultdict(list)
+            for record in book.data.values():
+                first_letter = record.name.value[0].upper()
+                contacts_by_letter[first_letter].append(record)
+
+            html = ""
+            for letter in sorted(contacts_by_letter.keys()):
+                html += f'<h2 style="margin-top:20px; border-bottom:1px solid #ccc;">{letter}</h2>'
+                for record in sorted(contacts_by_letter[letter], key=lambda r: r.name.value.lower()):
+                    html += record_card_html(record)
+
+            st.markdown(html, unsafe_allow_html=True)
+
+        elif command in ["birthdays", "birthdays-in"]:
+            st.text(result)
+
+        elif isinstance(result, tuple) and result[0] == "exit":
+            st.write(result[1])
         else:
-            st.warning("Contact not found")
+            st.write(result)
 
-    elif command in ["all"]:
-        html = "".join(record_card_html(r) for r in book.data.values())
-        st.markdown(html, unsafe_allow_html=True)
-
-    elif command in ["birthdays", "birthdays-in"]:
-        st.text(result)
-
-    elif isinstance(result, tuple) and result[0] == "exit":
-        st.write(result[1])
-    else:
-        st.write(result)
-
-    save_data(book)
+        save_data(book)
