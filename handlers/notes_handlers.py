@@ -1,13 +1,20 @@
-"""Handlers for managing per-contact notes via the CLI."""
+"""Pure application logic for per-contact notes."""
 
-from utils.decorators import input_error
+from typing import List, Dict
 
+class CommandResult:
+    """Encapsulate the outcome of a command."""
+    def __init__(self, success: bool, payload=None, message: str = ""):
+        self.success = success
+        self.payload = payload  # raw data, e.g., record, list of notes
+        self.message = message
 
-@input_error
-def add_note(args, book):
-    """Add a note with optional tags to the given contact."""
+def add_note(args, book) -> CommandResult:
+    if len(args) < 2:
+        return CommandResult(False, message="Expected contact name and note text")
+
     name, *rest = args
-    tags = []
+    tags: List[str] = []
 
     if rest and rest[-1].startswith("tags:"):
         tag_str = rest.pop()
@@ -16,16 +23,18 @@ def add_note(args, book):
     note_text = " ".join(rest)
     record = book.find(name)
     if not record:
-        raise KeyError(f"Contact '{name}' not found.")
+        return CommandResult(False, message=f"Contact '{name}' not found.")
 
     record.add_note(note_text, tags)
-    return "Note added."
+    return CommandResult(True, payload=record, message="Note added.")
 
-@input_error
-def edit_note(args, book):
-    """Edit an existing note for a contact, updating text and/or tags."""
+
+def edit_note(args, book) -> CommandResult:
+    if len(args) < 2:
+        return CommandResult(False, message="Expected contact name and note index")
+
     name, index_str, *rest = args
-    new_tags = None
+    new_tags: List[str] = None
 
     if rest and rest[-1].startswith("tags:"):
         tag_str = rest.pop()
@@ -34,62 +43,51 @@ def edit_note(args, book):
     new_text = " ".join(rest) if rest else None
     record = book.find(name)
     if not record:
-        raise KeyError(f"Contact '{name}' not found.")
+        return CommandResult(False, message=f"Contact '{name}' not found.")
 
     record.edit_note(int(index_str), new_text, new_tags)
-    return "Note updated."
+    return CommandResult(True, payload=record, message="Note updated.")
 
-@input_error
-def delete_note(args, book):
-    """Delete a note by index for the given contact."""
+
+def delete_note(args, book) -> CommandResult:
+    if len(args) != 2:
+        return CommandResult(False, message="Expected contact name and note index")
+
     name, index_str = args
     record = book.find(name)
     if not record:
-        raise KeyError(f"Contact '{name}' not found.")
+        return CommandResult(False, message=f"Contact '{name}' not found.")
 
     record.delete_note(int(index_str))
-    return "Note deleted."
+    return CommandResult(True, payload=record, message="Note deleted.")
 
-@input_error
-def show_notes(args, book):
-    """Show all notes for a contact, optionally filtered by tag."""
+
+def show_notes(args, book) -> CommandResult:
     if not args:
-        return "Please specify contact name. Example: notes Vasya"
+        return CommandResult(False, message="Please specify contact name")
 
     name = args[0]
     filter_tag = args[1] if len(args) > 1 else None
     record = book.find(name)
     if not record:
-        raise KeyError(f"Contact '{name}' not found.")
+        return CommandResult(False, message=f"Contact '{name}' not found.")
 
-    notes = record.list_notes(filter_tag)
-    return "\n".join(notes) if notes else "No notes found."
+    notes: List[str] = record.list_notes(filter_tag)
+    return CommandResult(True, payload=notes, message="No notes found." if not notes else "")
 
-@input_error
-def search_notes(args, book):
+
+def search_notes(args, book) -> CommandResult:
+    if len(args) != 2:
+        return CommandResult(False, message="Expected contact name and tag")
+
     name, tag = args
-
     record = book.find(name)
     if not record:
-        return "Contact not found."
+        return CommandResult(False, message="Contact not found.")
 
-    result = [
+    result: List[Dict] = [
         note for note in record.notes
         if tag.lower() in [t.lower() for t in note["tags"]]
     ]
 
-    if not result:
-        return f"No notes with tag '{tag}'."
-
-    lines = []
-    lines.append(f"**📝 Notes with tag '{tag}'**")
-    lines.append(f"**📇 Contact:** {record.name.value}")
-    lines.append("")
-
-    for i, note in enumerate(result, 1):
-        tags = ", ".join(note["tags"]) if note["tags"] else "No tags"
-        lines.append(f"{i}. 📄 {note['text']}")
-        lines.append(f"   🔖 Tags: {tags}")
-        lines.append("")
-
-    return "\n".join(lines)
+    return CommandResult(True, payload=result, message=f"No notes with tag '{tag}'." if not result else "")

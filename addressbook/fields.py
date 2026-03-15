@@ -10,6 +10,7 @@ class Field:
     def __init__(self, value):
         self.value = value
 
+    # ⚠️ Keep __str__ simple for debugging; don't format for UI
     def __str__(self):
         return str(self.value)
 
@@ -42,18 +43,12 @@ class Birthday(Field):
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
 
-    def __str__(self):
-        return self.value.strftime("%d.%m.%Y")
-
-
 class Email(Field):
     """Email address validated by a simple regex."""
 
     EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 
     def __init__(self, value):
-
         if not re.fullmatch(self.EMAIL_REGEX, value):
             raise ValueError("Invalid email format.")
-
         super().__init__(value)
