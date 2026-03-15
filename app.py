@@ -81,7 +81,19 @@ with main:
                 st.warning("Contact not found")
 
         elif command in ["all"]:
-            html = "".join(record_card_html(r) for r in book.data.values())
+            from collections import defaultdict
+
+            contacts_by_letter = defaultdict(list)
+            for record in book.data.values():
+                first_letter = record.name.value[0].upper()
+                contacts_by_letter[first_letter].append(record)
+
+            html = ""
+            for letter in sorted(contacts_by_letter.keys()):
+                html += f'<h2 style="margin-top:20px; border-bottom:1px solid #ccc;">{letter}</h2>'
+                for record in sorted(contacts_by_letter[letter], key=lambda r: r.name.value.lower()):
+                    html += record_card_html(record)
+
             st.markdown(html, unsafe_allow_html=True)
 
         elif command in ["birthdays", "birthdays-in"]:
