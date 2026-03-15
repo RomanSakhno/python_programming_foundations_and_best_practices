@@ -1,0 +1,13 @@
+[project]
+name = "address-book-assistant"
+version = "0.1.0"
+dependencies = [
+    "streamlit",
+    "requests"
+]
+
+[project.scripts]
+address-book = "ClientApp.main:run"
+
+[tool.setuptools.packages.find]
+include = ["ClientApp*", "handlers*", "services*", "utils*", "addressbook*"]
