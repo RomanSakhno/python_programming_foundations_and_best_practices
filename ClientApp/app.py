@@ -3,11 +3,14 @@ from handlers.commands_registry import COMMANDS
 from services.storage import load_data, save_data
 from utils.nlp_engine import interpret_command, resolve_command
 from utils.parser import parse_input
-from utils.html_renderer import record_card_html, notes_card_html
-from utils.birthday_calendar import render_birthday_calendar
-from ClientApp.utils.notes_sidebar import render_notes_by_tags
+from ClientApp.components.html_renderer import record_card_html, notes_card_html
+from ClientApp.components.birthday_calendar import render_birthday_calendar
+from ClientApp.components.notes_sidebar import render_notes_by_tags
+from ClientApp.components.weather_widget import render_weather
 
-left_spacer, main= st.columns([1, 3])
+
+st.set_page_config(layout="wide")
+main, right_spacer= st.columns([4, 1])
 
 book = load_data()
 
@@ -16,6 +19,12 @@ st.sidebar.markdown(
 
 st.sidebar.markdown(
     render_notes_by_tags(book), unsafe_allow_html=True)
+
+with right_spacer:
+    latitude = 36.7213
+    longitude = -4.4217
+    weather_html = render_weather(latitude, longitude)
+    st.markdown(weather_html, unsafe_allow_html=True)
 
 
 with main:
