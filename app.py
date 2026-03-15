@@ -7,18 +7,16 @@ from utils.html_renderer import record_card_html, notes_card_html
 from utils.birthday_calendar import render_birthday_calendar
 from ClientApp.utils.notes_sidebar import render_notes_by_tags
 
-main, notes_panel = st.columns([3,3])
+left_spacer, main= st.columns([1, 3])
 
 book = load_data()
 
 st.sidebar.markdown(
-    render_birthday_calendar(book),
-   unsafe_allow_html=True
-)
+    render_birthday_calendar(book),unsafe_allow_html=True)
 
-with notes_panel:
-    with notes_panel:
-        st.markdown(render_notes_by_tags(book), unsafe_allow_html=True)
+st.sidebar.markdown(
+    render_notes_by_tags(book), unsafe_allow_html=True)
+
 
 with main:
     st.title("📇 Address Book Assistant")
