@@ -1,13 +1,14 @@
 from collections import defaultdict
 
 def render_notes_by_tags(book):
+    """Render all notes grouped by tags as styled HTML."""
     tags = defaultdict(list)
 
     for record in book.data.values():
         for note in record.notes:
             for tag in note["tags"]:
                 tags[tag].append({
-                    "contact": record.name.value,
+                    "contact": record.name.value.title(),  # Title Case вместо ВСЕХ БУКВ
                     "text": note["text"]
                 })
 
@@ -17,10 +18,19 @@ def render_notes_by_tags(book):
     html = "<h4>📝 Notes by tags</h4>"
 
     for tag, notes in sorted(tags.items()):
-        html += f'<div style="border:1px solid #ddd;border-radius:8px;padding:8px;margin-bottom:8px;background:#f9f9f9;"><strong>#{tag}</strong>'
+        html += (
+            '<div style="border:2px solid #ccc;border-radius:8px;'
+            'padding:8px;margin-bottom:12px;background-color:#f9f9f9;">'
+            f'<strong>#{tag.upper()}</strong>'
+        )
 
         for note in notes:
-            html += f'<div style="margin-top:4px;">📄 {note["text"]}<br><small>👤 {note["contact"]}</small></div>'
+            html += (
+                '<div style="margin-top:6px;padding-left:6px;">'
+                f'📄 {note["text"]}<br>'
+                f'<small>👤 {note["contact"]}</small>'
+                '</div>'
+            )
 
         html += '</div>'
 

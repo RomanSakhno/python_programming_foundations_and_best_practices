@@ -1,80 +1,63 @@
-"""Handlers for birthday-related CLI commands."""
+"""Handlers for birthday-related commands (pure application logic)."""
 
-from utils.decorators import input_error
 from services.birthday_range_service import get_birthdays_within
 
 
-@input_error
-def add_birthday(args, book):
+class CommandResult:
+    """Encapsulate the outcome of a command."""
+    def __init__(self, success: bool, payload=None, message: str = ""):
+        self.success = success
+        self.payload = payload  # can be data dict or list
+        self.message = message  # optional short text message
+
+
+def add_birthday(args, book) -> CommandResult:
     """Attach a birthday to an existing contact."""
+    if len(args) != 2:
+        return CommandResult(False, message="Expected name and birthday")
 
     name, birthday = args
-
     record = book.find(name)
-
     if not record:
-        raise KeyError()
+        return CommandResult(False, message="Contact not found")
 
     record.add_birthday(birthday)
+    return CommandResult(True, payload={"name": name, "birthday": record.birthday.value})
 
-    return "Birthday added."
 
-
-@input_error
-def show_birthday(args, book):
-    """Show the stored birthday for a contact, if any."""
+def show_birthday(args, book) -> CommandResult:
+    """Return the stored birthday for a contact."""
+    if len(args) != 1:
+        return CommandResult(False, message="Expected contact name")
 
     name = args[0]
-
     record = book.find(name)
-
     if not record:
-        raise KeyError()
+        return CommandResult(False, message="Contact not found")
 
     if not record.birthday:
-        return "Birthday not set."
+        return CommandResult(True, payload=None, message="Birthday not set")
 
-    return str(record.birthday)
+    return CommandResult(True, payload={"name": name, "birthday": record.birthday.value})
 
 
-@input_error
-def birthdays(args, book):
-    """Show upcoming birthdays in the next seven days."""
-
+def birthdays(args, book) -> CommandResult:
+    """Return upcoming birthdays in the next 7 days."""
     upcoming = book.get_upcoming_birthdays()
-
-    if not upcoming:
-        return "No upcoming birthdays."
-
-    return "\n".join(
-        f"{item['name']} - {item['congratulation_date']}"
-        for item in upcoming
-    )
+    return CommandResult(True, payload=upcoming)
 
 
-@input_error
-def birthdays_in(args, book):
-    """Show birthdays that fall within the next given number of days."""
-
+def birthdays_in(args, book) -> CommandResult:
+    """Return birthdays within the next N days."""
     if not args:
-        raise IndexError()
-
-    days_str = args[0]
+        return CommandResult(False, message="Days argument required")
 
     try:
-        days = int(days_str)
+        days = int(args[0])
+        if days < 0:
+            raise ValueError
     except ValueError:
-        raise ValueError("Days must be an integer.")
-
-    if days < 0:
-        raise ValueError("Days must be a non-negative integer.")
+        return CommandResult(False, message="Days must be a non-negative integer")
 
     upcoming = get_birthdays_within(book, days)
-
-    if not upcoming:
-        return f"No birthdays within {days} days."
-
-    return "\n".join(
-        f"{item['name']} - {item['congratulation_date']}"
-        for item in upcoming
-    )
+    return CommandResult(True, payload=upcoming)
