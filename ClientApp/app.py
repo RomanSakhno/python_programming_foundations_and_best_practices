@@ -7,18 +7,18 @@ from ClientApp.components.html_renderer import record_card_html, notes_card_html
 from ClientApp.components.birthday_calendar import render_birthday_calendar
 from ClientApp.components.notes_sidebar import render_notes_by_tags
 from ClientApp.components.weather_widget import render_weather
-
+from utils.command_suggester import get_command_suggestions
+from ClientApp.components.command_helper import render_command_helper
+from collections import defaultdict
 
 st.set_page_config(layout="wide")
-main, right_spacer= st.columns([4, 1])
+main, right_spacer = st.columns([4, 1])
 
 book = load_data()
 
-st.sidebar.markdown(
-    render_birthday_calendar(book),unsafe_allow_html=True)
-
-st.sidebar.markdown(
-    render_notes_by_tags(book), unsafe_allow_html=True)
+# ---- Sidebar ----
+st.sidebar.markdown(render_birthday_calendar(book), unsafe_allow_html=True)
+st.sidebar.markdown(render_notes_by_tags(book), unsafe_allow_html=True)
 
 with right_spacer:
     latitude = 36.7213
@@ -26,48 +26,66 @@ with right_spacer:
     weather_html = render_weather(latitude, longitude)
     st.markdown(weather_html, unsafe_allow_html=True)
 
-
 with main:
     st.title("📇 Address Book Assistant")
 
-    user_input = st.text_input("Enter command")
+    if "show_suggestions" not in st.session_state:
+        st.session_state.show_suggestions = False
+    if "last_input" not in st.session_state:
+        st.session_state.last_input = ""
 
-    if user_input:
-        command, args = interpret_command(user_input, COMMANDS.keys())
+    user_input = st.text_input("Enter command", key="user_input")
 
-        if not command:
-            command, args = parse_input(user_input)
+    if user_input != st.session_state.last_input:
+        st.session_state.show_suggestions = False
+        st.session_state.last_input = user_input
 
-        resolved_command, suggestion = resolve_command(command, COMMANDS.keys())
+    tab_pressed = st.button("Tab", key="show_tab_suggestions")
+    if tab_pressed and user_input:
+        st.session_state.show_suggestions = True
 
-        if resolved_command:
-            command = resolved_command
-        else:
-            if suggestion:
-                st.warning(f"Did you mean '{suggestion}'?")
-            else:
-                st.error("Invalid command")
-            st.stop()
+    if st.session_state.show_suggestions:
+        suggestions = get_command_suggestions(user_input)
+        if suggestions:
+            st.markdown(render_command_helper(suggestions), unsafe_allow_html=True)
+        st.stop()
 
-        action = COMMANDS.get(command)
-        if not action:
-            st.warning(f"Command '{command}' not implemented")
-            st.stop()
+    command, args = interpret_command(user_input, COMMANDS.keys())
+    if not command:
+        command, args = parse_input(user_input)
 
-        result = action(args, book)
+    if command is None:
+        st.info("⏳ Enter a command")
+        st.stop()
+
+
+    action = COMMANDS.get(command)
+    if not action:
+        st.warning(f"Command '{command}' not implemented")
+    else:
+        try:
+            result = action(args, book)
+        except IndexError:
+            result = "Error: missing arguments"
 
         if command in ["show-notes", "search-note"]:
-            name = args[0]
-            tag = args[1] if len(args) > 1 else None
-            record = book.find(name)
-            if record:
-                html = notes_card_html(record, tag)
-                st.markdown(html, unsafe_allow_html=True)
+            if len(args) < 1:
+                st.info("⏳ Enter name (and optionally tag) to show notes")
             else:
-                st.warning("Contact not found")
+                name = args[0]
+                tag = args[1] if len(args) > 1 else None
+                record = book.find(name)
+                if record:
+                    html = notes_card_html(record, tag)
+                    st.markdown(html, unsafe_allow_html=True)
+                else:
+                    st.warning("Contact not found")
 
         elif command in ["phone", "show-birthday"]:
-            html = f"""
+            if len(args) < 1:
+                st.info("⏳ Enter name to show info")
+            else:
+                html = f"""
                     <div style="
                         border: 1px solid #ccc;
                         border-radius: 10px;
@@ -79,19 +97,20 @@ with main:
                         <strong>{result}</strong>
                     </div>
                     """
-            st.markdown(html, unsafe_allow_html=True)
+                st.markdown(html, unsafe_allow_html=True)
 
         elif command in ["find", "search"]:
-            record = book.find(args[0])
-            if record:
-                html = record_card_html(record)
-                st.markdown(html, unsafe_allow_html=True)
+            if len(args) < 1:
+                st.info("⏳ Enter name to search")
             else:
-                st.warning("Contact not found")
+                record = book.find(args[0])
+                if record:
+                    html = record_card_html(record)
+                    st.markdown(html, unsafe_allow_html=True)
+                else:
+                    st.warning("Contact not found")
 
         elif command in ["all"]:
-            from collections import defaultdict
-
             contacts_by_letter = defaultdict(list)
             for record in book.data.values():
                 first_letter = record.name.value[0].upper()
@@ -113,4 +132,4 @@ with main:
         else:
             st.write(result)
 
-        save_data(book)
+    save_data(book)

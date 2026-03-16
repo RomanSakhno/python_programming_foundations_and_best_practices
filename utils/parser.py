@@ -2,8 +2,8 @@
 
 
 def parse_input(user_input: str):
-    """Split raw input into a lowercase command and list of arguments."""
-
-    cmd, *args = user_input.strip().split()
-
+    parts = user_input.strip().split()
+    if not parts:
+        return None, []
+    cmd, *args = parts
     return cmd.lower(), args
